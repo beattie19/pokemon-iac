@@ -91,6 +91,15 @@ resource "aws_iam_role_policy" "dynamo_role_policy" {
         Effect   = "Allow"
         Resource = aws_dynamodb_table.pokemon-data.arn
       },
+      {
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Resource = "arn:aws:logs:*:*:*",
+        Effect = "Allow"
+      },
     ]
   })
 }
@@ -98,4 +107,14 @@ resource "aws_iam_role_policy" "dynamo_role_policy" {
 resource "aws_lambda_event_source_mapping" "retrieve_and_store_pokemon_data" {
   event_source_arn = aws_sqs_queue.populatePokemon.arn
   function_name    = aws_lambda_function.retrieve_and_store_pokemon_data.arn
+}
+
+resource "aws_lambda_function" "get_all_pokemon_from_db" {
+  function_name = "getAllPokemonFromDB"
+
+  runtime          = "nodejs14.x"
+  handler          = "getAllPokemonFromDB.handler"
+  source_code_hash = data.archive_file.zip_lambdas.output_base64sha256
+  filename         = "lambda.zip"
+  role             = aws_iam_role.lambda_exec.arn
 }
