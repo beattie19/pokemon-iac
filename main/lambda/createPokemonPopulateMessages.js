@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk');
 const sqs = new AWS.SQS({region: 'ap-southeast-2', apiVersion: '2012-11-05'});
-const QUEUE_URL = 'https://sqs.ap-southeast-2.amazonaws.com/784557455711/populatePokemon';
+const QUEUE_URL = 'https://sqs.ap-southeast-2.amazonaws.com/784557455711/populate-pokemon';
 const POKEMON_COUNT = 5;
 
 exports.handler = async function(event, context, callback) {
