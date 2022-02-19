@@ -1,7 +1,6 @@
 const AWS = require('aws-sdk');
 const dynamoDB = new AWS.DynamoDB({ region: 'ap-southeast-2', apiVersion: '2012-08-10' });
-var QUEUE_URL = 'https://sqs.ap-southeast-2.amazonaws.com/784557455711/populatePokemon';
-
+const QUEUE_URL = 'https://sqs.ap-southeast-2.amazonaws.com/784557455711/populate-pokemon';
 const https = require('https');
 
 exports.handler = async (event, context) => {
@@ -23,14 +22,13 @@ exports.handler = async (event, context) => {
         const req = https.request(options, (res) => {
 
             var body = [];
-            res.on('data', function(chunk) {
+            res.on('data', function (chunk) {
                 body.push(chunk);
             });
-            res.on('end', function() {
+            res.on('end', function () {
                 try {
                     body = Buffer.concat(body);
-                }
-                catch (e) {
+                } catch (e) {
                     reject(e);
                 }
                 resolve(body);
@@ -39,22 +37,22 @@ exports.handler = async (event, context) => {
         });
 
         req.end();
-        });
-        
-        await pokemonPromise.then((data) => {
-            console.log('first then');
-            return Buffer.from(data).toString();
-                
-        }).then(async (data) => {
-            const object = JSON.parse(data);
+    });
 
-            const getTypes = (types) => {
-              return types.map(({ type }) => type.name);
-            };
-            
-            const params = {
+    await pokemonPromise.then((data) => {
+        console.log('first then');
+        return Buffer.from(data).toString();
+
+    }).then(async (data) => {
+        const object = JSON.parse(data);
+
+        const getTypes = (types) => {
+            return types.map(({type}) => type.name);
+        };
+
+        const params = {
             Item: {
-                "id": {
+                "PokemonId": {
                     N: `${object.id}`
                 },
                 "Name": {
@@ -91,13 +89,12 @@ exports.handler = async (event, context) => {
                     N: `${object.stats[5].base_stat}`
                 }
             },
-            TableName: "pokemon",
+            TableName: "pokemon-data",
             ReturnConsumedCapacity: 'TOTAL'
         };
 
-            console.log('data', data);
-            var result = await dynamoDB.putItem(params).promise();
-        });
-        
-        
-};
+        console.log('data', data);
+        var result = await dynamoDB.putItem(params).promise();
+    });
+}
+

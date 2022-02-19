@@ -3,12 +3,12 @@ resource "aws_lambda_function" "create_pokemon_populate_messages" {
 
   runtime          = "nodejs14.x"
   handler          = "createPokemonPopulateMessages.handler"
-  source_code_hash = data.archive_file.lambda_create_pokemon_populate_messages.output_base64sha256
+  source_code_hash = data.archive_file.zip_lambdas.output_base64sha256
   filename         = "lambda.zip"
   role             = aws_iam_role.lambda_exec.arn
 }
 
-data "archive_file" "lambda_create_pokemon_populate_messages" {
+data "archive_file" "zip_lambdas" {
   type        = "zip"
   source_dir  = "${path.module}/main/lambda"
   output_path = "${path.module}/lambda.zip"
@@ -46,8 +46,8 @@ resource "aws_s3_bucket" "lambda_bucket" {
 resource "aws_s3_object" "lambda_pokemon" {
   bucket = aws_s3_bucket.lambda_bucket.id
   key    = "lambda.zip"
-  source = data.archive_file.lambda_create_pokemon_populate_messages.output_path
-  etag   = filemd5(data.archive_file.lambda_create_pokemon_populate_messages.output_path)
+  source = data.archive_file.zip_lambdas.output_path
+  etag   = filemd5(data.archive_file.zip_lambdas.output_path)
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_policy" {
@@ -64,4 +64,16 @@ resource "aws_lambda_permission" "apigw" {
   # The /*/* portion grants access from any method on any resource
   # within the API Gateway "REST API".
   source_arn = "${aws_api_gateway_rest_api.populate-pokemon.execution_arn}/*/*"
+}
+
+# =============================================
+
+resource "aws_lambda_function" "retrieve_and_store_pokemon_data" {
+  function_name = "retrieveAndStorePokemonData"
+
+  runtime          = "nodejs14.x"
+  handler          = "retrieveAndStorePokemonData.handler"
+  source_code_hash = data.archive_file.zip_lambdas.output_base64sha256
+  filename         = "lambda.zip"
+  role             = aws_iam_role.lambda_exec.arn
 }
