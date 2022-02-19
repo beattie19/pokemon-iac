@@ -18,7 +18,12 @@ resource "aws_sqs_queue_policy" "sqs_send" {
       "Sid": "First",
       "Effect": "Allow",
       "Principal": "*",
-      "Action": "sqs:SendMessage",
+      "Action" : [
+        "sqs:DeleteMessage",
+        "sqs:ReceiveMessage",
+        "sqs:SendMessage",
+        "sqs:GetQueueAttributes"
+      ],
       "Resource": "${aws_sqs_queue.populatePokemon.arn}"
     }
   ]

@@ -94,3 +94,8 @@ resource "aws_iam_role_policy" "dynamo_role_policy" {
     ]
   })
 }
+
+resource "aws_lambda_event_source_mapping" "retrieve_and_store_pokemon_data" {
+  event_source_arn = aws_sqs_queue.populatePokemon.arn
+  function_name    = aws_lambda_function.retrieve_and_store_pokemon_data.arn
+}
