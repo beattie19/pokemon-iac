@@ -66,6 +66,17 @@ resource "aws_lambda_permission" "apigw" {
   source_arn = "${aws_api_gateway_rest_api.populate-pokemon.execution_arn}/*/*"
 }
 
+resource "aws_lambda_permission" "apigw-all-pokemon" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.get_all_pokemon_from_db.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  # The /*/* portion grants access from any method on any resource
+  # within the API Gateway "REST API".
+  source_arn = "${aws_api_gateway_rest_api.populate-pokemon.execution_arn}/*/*"
+}
+
 # =============================================
 
 resource "aws_lambda_function" "retrieve_and_store_pokemon_data" {

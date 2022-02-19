@@ -33,7 +33,11 @@ exports.handler = (event, context, callback) => {
             console.log(items)
             callback(null, {
                 statusCode: 200,
-                body: items,
+                body: JSON.stringify(items),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
             });
         }
     });
