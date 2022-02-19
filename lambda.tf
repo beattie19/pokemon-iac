@@ -77,3 +77,20 @@ resource "aws_lambda_function" "retrieve_and_store_pokemon_data" {
   filename         = "lambda.zip"
   role             = aws_iam_role.lambda_exec.arn
 }
+
+resource "aws_iam_role_policy" "dynamo_role_policy" {
+  name = "dynamo_role_policy"
+  role = aws_iam_role.lambda_exec.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "dynamodb:*",
+        ]
+        Effect   = "Allow"
+        Resource = aws_dynamodb_table.pokemon-data.arn
+      },
+    ]
+  })
+}
