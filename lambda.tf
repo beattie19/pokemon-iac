@@ -1,15 +1,15 @@
 resource "aws_lambda_function" "create_pokemon_populate_messages" {
   function_name = "createPokemonPopulateMessages"
 
-  runtime = "nodejs14.x"
-  handler = "createPokemonPopulateMessages.handler"
+  runtime          = "nodejs14.x"
+  handler          = "createPokemonPopulateMessages.handler"
   source_code_hash = data.archive_file.lambda_create_pokemon_populate_messages.output_base64sha256
-  filename = "lambda.zip"
-  role = aws_iam_role.lambda_exec.arn
+  filename         = "lambda.zip"
+  role             = aws_iam_role.lambda_exec.arn
 }
 
 data "archive_file" "lambda_create_pokemon_populate_messages" {
-  type = "zip"
+  type        = "zip"
   source_dir  = "${path.module}/main/lambda"
   output_path = "${path.module}/lambda.zip"
 }
@@ -32,7 +32,7 @@ resource "aws_iam_role" "lambda_exec" {
       Principal = {
         Service = "lambda.amazonaws.com"
       }
-    }
+      }
     ]
   })
 }
@@ -47,7 +47,7 @@ resource "aws_s3_object" "lambda_pokemon" {
   bucket = aws_s3_bucket.lambda_bucket.id
   key    = "lambda.zip"
   source = data.archive_file.lambda_create_pokemon_populate_messages.output_path
-  etag = filemd5(data.archive_file.lambda_create_pokemon_populate_messages.output_path)
+  etag   = filemd5(data.archive_file.lambda_create_pokemon_populate_messages.output_path)
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_policy" {
