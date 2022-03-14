@@ -1,6 +1,6 @@
 resource "aws_lambda_function" "create_pokemon_populate_messages" {
   function_name = "createPokemonPopulateMessages"
-
+  timeout         = 120
   runtime          = "nodejs14.x"
   handler          = "createPokemonPopulateMessages.handler"
   source_code_hash = data.archive_file.zip_lambdas.output_base64sha256
@@ -81,7 +81,7 @@ resource "aws_lambda_permission" "apigw-all-pokemon" {
 
 resource "aws_lambda_function" "retrieve_and_store_pokemon_data" {
   function_name = "retrieveAndStorePokemonData"
-
+  timeout         = 20
   runtime          = "nodejs14.x"
   handler          = "retrieveAndStorePokemonData.handler"
   source_code_hash = data.archive_file.zip_lambdas.output_base64sha256
@@ -122,7 +122,7 @@ resource "aws_lambda_event_source_mapping" "retrieve_and_store_pokemon_data" {
 
 resource "aws_lambda_function" "get_all_pokemon_from_db" {
   function_name = "getAllPokemonFromDB"
-
+  timeout         = 20
   runtime          = "nodejs14.x"
   handler          = "getAllPokemonFromDB.handler"
   source_code_hash = data.archive_file.zip_lambdas.output_base64sha256
