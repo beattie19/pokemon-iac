@@ -1,14 +1,40 @@
+variable "service_prefix" {
+  type = string
+}
 variable "account_id" {
-  type    = string
-  default = 784577455711
+  type = string
 }
 
 variable "my_region" {
-  type    = string
-  default = "ap-southeast-2"
+  type = string
 }
 
 variable "environment" {
   type    = string
-  default = "staging"
+  default = "dev"
 }
+
+variable "lambda_bucket_name" {
+  type = string
+}
+
+variable "lambda_zip_filename" {
+  type = string
+}
+
+variable "pokemon_queue" {
+  type = string
+}
+
+variable "domain_name" {
+  type = string
+}
+
+variable "api_domain_name" {
+  type = string
+}
+
+variable "dynamo_table_name" {
+  type = string
+}
+

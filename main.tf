@@ -16,3 +16,19 @@ terraform {
 
   required_version = "~> 1.0"
 }
+
+module "sqs" {
+  source        = "./modules/sqs"
+  pokemon_queue = var.pokemon_queue
+}
+
+module "domain" {
+  source          = "./modules/domain"
+  api_domain_name = var.api_domain_name
+  domain_name     = var.domain_name
+}
+
+module "dynamo" {
+  source     = "./modules/dynamo"
+  table_name = var.dynamo_table_name
+}
