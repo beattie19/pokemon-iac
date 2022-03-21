@@ -41,7 +41,7 @@ resource "aws_api_gateway_deployment" "pokemon_deployment" {
 resource "aws_api_gateway_stage" "pokemon_stage" {
   deployment_id = aws_api_gateway_deployment.pokemon_deployment.id
   rest_api_id   = aws_api_gateway_rest_api.populate-pokemon.id
-  stage_name    = "dev"
+  stage_name    = var.environment
 }
 
 output "base_url" {
@@ -123,4 +123,51 @@ resource "aws_api_gateway_integration_response" "options_integration_response" {
 
 output "all_pokemon_url" {
   value = "${aws_api_gateway_deployment.pokemon_deployment.invoke_url}/${aws_api_gateway_resource.all-pokemon-resource.path_part}"
+}
+
+# ============== ACM ============
+resource "aws_api_gateway_domain_name" "beatwoodmac_domain_name" {
+  domain_name              = "api.beatwoodmac.com"
+  regional_certificate_arn = aws_acm_certificate_validation.beatwoodmac_cert_validation.certificate_arn
+#  certificate_arn = aws_acm_certificate.beatwoodmac_cert.arn
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
+}
+
+resource "aws_api_gateway_base_path_mapping" "domain_mapping_beatwoodmac" {
+  api_id      = aws_api_gateway_rest_api.populate-pokemon.id
+  stage_name  = aws_api_gateway_stage.pokemon_stage.stage_name
+  domain_name = aws_api_gateway_domain_name.beatwoodmac_domain_name.domain_name
+}
+resource "aws_acm_certificate" "beatwoodmac_cert" {
+  domain_name       = "api.beatwoodmac.com"
+  validation_method = "DNS"
+}
+
+data "aws_route53_zone" "beatwoodmac_zone" {
+  name         = "beatwoodmac.com"
+  private_zone = false
+}
+
+resource "aws_route53_record" "beatwoodmac_record" {
+  for_each = {
+    for dvo in aws_acm_certificate.beatwoodmac_cert.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = data.aws_route53_zone.beatwoodmac_zone.zone_id
+}
+
+resource "aws_acm_certificate_validation" "beatwoodmac_cert_validation" {
+  certificate_arn         = aws_acm_certificate.beatwoodmac_cert.arn
+  validation_record_fqdns = [for record in aws_route53_record.beatwoodmac_record : record.fqdn]
 }

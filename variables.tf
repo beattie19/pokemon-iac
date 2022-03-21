@@ -10,5 +10,5 @@ variable "my_region" {
 
 variable "environment" {
   type    = string
-  default = "test"
+  default = "staging"
 }
