@@ -1,10 +1,10 @@
 resource "aws_lambda_function" "create_pokemon_populate_messages" {
-  function_name = "createPokemonPopulateMessages"
-  timeout         = 120
+  function_name    = "createPokemonPopulateMessages"
+  timeout          = 120
   runtime          = "nodejs14.x"
   handler          = "createPokemonPopulateMessages.handler"
   source_code_hash = data.archive_file.zip_lambdas.output_base64sha256
-  filename         = "lambda.zip"
+  filename         = var.lambda_zip_filename
   role             = aws_iam_role.lambda_exec.arn
 }
 
@@ -37,19 +37,6 @@ resource "aws_iam_role" "lambda_exec" {
   })
 }
 
-resource "aws_s3_bucket" "lambda_bucket" {
-  bucket = "stephen-pokemon-lambdas"
-
-  force_destroy = true
-}
-
-resource "aws_s3_object" "lambda_pokemon" {
-  bucket = aws_s3_bucket.lambda_bucket.id
-  key    = "lambda.zip"
-  source = data.archive_file.zip_lambdas.output_path
-  etag   = filemd5(data.archive_file.zip_lambdas.output_path)
-}
-
 resource "aws_iam_role_policy_attachment" "lambda_policy" {
   role       = aws_iam_role.lambda_exec.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -80,12 +67,12 @@ resource "aws_lambda_permission" "apigw-all-pokemon" {
 # =============================================
 
 resource "aws_lambda_function" "retrieve_and_store_pokemon_data" {
-  function_name = "retrieveAndStorePokemonData"
-  timeout         = 20
+  function_name    = "retrieveAndStorePokemonData"
+  timeout          = 20
   runtime          = "nodejs14.x"
   handler          = "retrieveAndStorePokemonData.handler"
   source_code_hash = data.archive_file.zip_lambdas.output_base64sha256
-  filename         = "lambda.zip"
+  filename         = var.lambda_zip_filename
   role             = aws_iam_role.lambda_exec.arn
 }
 
@@ -100,7 +87,7 @@ resource "aws_iam_role_policy" "dynamo_role_policy" {
           "dynamodb:*",
         ]
         Effect   = "Allow"
-        Resource = aws_dynamodb_table.pokemon-data.arn
+        Resource = module.dynamo.table_arn
       },
       {
         Action = [
@@ -109,23 +96,23 @@ resource "aws_iam_role_policy" "dynamo_role_policy" {
           "logs:PutLogEvents"
         ],
         Resource = "arn:aws:logs:*:*:*",
-        Effect = "Allow"
+        Effect   = "Allow"
       },
     ]
   })
 }
 
 resource "aws_lambda_event_source_mapping" "retrieve_and_store_pokemon_data" {
-  event_source_arn = aws_sqs_queue.populatePokemon.arn
+  event_source_arn = module.sqs.queue_arn
   function_name    = aws_lambda_function.retrieve_and_store_pokemon_data.arn
 }
 
 resource "aws_lambda_function" "get_all_pokemon_from_db" {
-  function_name = "getAllPokemonFromDB"
-  timeout         = 20
+  function_name    = "getAllPokemonFromDB"
+  timeout          = 20
   runtime          = "nodejs14.x"
   handler          = "getAllPokemonFromDB.handler"
   source_code_hash = data.archive_file.zip_lambdas.output_base64sha256
-  filename         = "lambda.zip"
+  filename         = var.lambda_zip_filename
   role             = aws_iam_role.lambda_exec.arn
 }

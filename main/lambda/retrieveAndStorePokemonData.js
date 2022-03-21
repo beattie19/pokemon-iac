@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk');
 const dynamoDB = new AWS.DynamoDB({ region: 'ap-southeast-2', apiVersion: '2012-08-10' });
-const QUEUE_URL = 'https://sqs.ap-southeast-2.amazonaws.com/784557455711/populate-pokemon';
+const QUEUE_URL = 'https://sqs.ap-southeast-2.amazonaws.com/784557455711/pokemon';
 const https = require('https');
 
 exports.handler = async (event, context) => {
