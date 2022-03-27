@@ -1,7 +1,7 @@
 resource "aws_api_gateway_domain_name" "api_domain_name" {
   domain_name              = var.api_domain_name
   regional_certificate_arn = aws_acm_certificate_validation.cert_validation.certificate_arn
-#  certificate_arn = aws_acm_certificate.cert.arn
+
   endpoint_configuration {
     types = ["REGIONAL"]
   }

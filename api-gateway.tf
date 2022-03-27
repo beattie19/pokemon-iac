@@ -1,6 +1,9 @@
 resource "aws_api_gateway_rest_api" "populate-pokemon" {
   name        = "populate-pokemon"
   description = "Entrypoint to creating SQS messages that will populate pokemon"
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
 }
 
 resource "aws_api_gateway_resource" "populate-pokemon-resource" {
@@ -28,7 +31,6 @@ resource "aws_api_gateway_integration" "populate_pokemon_lambda_integration" {
 
 resource "aws_api_gateway_deployment" "pokemon_deployment" {
   rest_api_id = aws_api_gateway_rest_api.populate-pokemon.id
-  stage_name  = var.environment
   depends_on = [
     aws_api_gateway_integration.populate_pokemon_lambda_integration,
     aws_api_gateway_integration.all_pokemon_lambda_integration,
@@ -118,9 +120,25 @@ resource "aws_api_gateway_integration_response" "options_integration_response" {
   depends_on = [aws_api_gateway_method_response.options_200]
 }
 
-resource "aws_api_gateway_base_path_mapping" "domain_mapping_beatwoodmac" {
+resource "aws_api_gateway_base_path_mapping" "domain_mapping" {
   api_id      = aws_api_gateway_rest_api.populate-pokemon.id
   stage_name  = aws_api_gateway_stage.pokemon_stage.stage_name
-  domain_name = module.domain.domain_name
+  domain_name = module.domain.api_gateway_domain_name
+}
+
+data "aws_route53_zone" "primary" {
+  name = var.domain_name
+}
+
+resource "aws_route53_record" "api_record" {
+  zone_id = data.aws_route53_zone.primary.zone_id
+  name    = var.api_domain_name
+  type    = "A"
+
+  alias {
+    evaluate_target_health = true
+    name                   = module.domain.api_gateway_regional_domain_name
+    zone_id                = module.domain.api_gateway_zone_id
+  }
 }
 
