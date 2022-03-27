@@ -1,31 +1,48 @@
-How we populate the data in DynamoDB?
+## What is this?
+This is a toy project set up for the purpose of learning Terraform and becoming more comfortable with some AWS services.
 
-- API gateway endpoint `/populate` being called will trigger `startPopulatePokemonMessages` -  Invoke URL: https://ymy7qb54pc.execute-api.ap-southeast-2.amazonaws.com/dev/populate 
-- This will publish an SNS topic - in this case the `populatePokemon` topic
-- AWS? will *fan* the message out to subscribed endpoints. For us this is `populatePokemon` lambda
-- That lambda will build and send messages to the queue - should be around 898 (this is how many pokemon there is)
-- Each of these messages are picked up by the lambda and invoke `triggerPopulatePokemon` - This method is responsible for querying for a specific pokemon and storing it's data in dynamo
+The initial idea was to:
+    - have the ability to trigger an api gateway endpoint to populate a dynamo database with via a lambda
+    - be able to retrieve stored data through api gateway endpoint
 
+## Usage
+### Terraform
+I am using [aws-vault](https://github.com/99designs/aws-vault) as a way interact with AWS
+- create tfvars file and supply all values
+- first run will require `terraform init` to download dependancies
+- (optional) `aws-vault exec {profile name} -- terraform plan -var-file="{choose name}.tfvars"` to create execution plan and review expected changes
+- `aws-vault exec {profile name} -- terraform apply -var-file="{choose name}.tfvars"` to execute the plan and create resources in AWS
+- `aws-vault exec beattie19 -- terraform destroy -var-file="dev.tfvars"` when finished to remove resources from AWS
 
-How do we retrieve data?
-Calling `/pokemon` will allow the retrieval of all pokemon - filtering happens in the frontend.
+### Application
+Once the `terraform apply` is successful there should be some outputs on the cli
+- `/populate` - Path to populate database with Pokemon data
+- `/all-pokemon` - Path retrieve all Pokemon data
 
-Current endpoint
-https://ymy7qb54pc.execute-api.ap-southeast-2.amazonaws.com/dev/pokemon
+## TODO
+### Docs
+- Create a better usage section
+- Add screenshots from Miro
 
-Decisions made:
-There is a few chains of messages/queues. This was important to ensure that we not timing out in the lambda.
+### Code
+- Create tfvars template so we know what needs to be set for this to work
+- Come up with a new solution that won't take down the database on destroy
+- Pass SQS queue into the lambda event so it's not hard coded
+- Allow the custom domain to code to be optional - don't want to require certificates etc when testing (or if someone else wants to use this)
+- Improve lambda for creating messages (may currently timeout) - may want a lambda that triggers a lambda.
+- Some duplication in API Gateway, consider creating a module.
 
-- there was something about batching with SQS/SNS - can't remember - My first approach for some reason only populated around 90 pokemon, not ~900.
+### Potential things to try
+- It would be good to be able to test locally
+    - could localstack work for my usecase?
+- Should I consider SAM for the lambda/api gateway instead?
+- Can docker fit into this in anyway
+- Add testing
 
-I wanted to use SNS because I want to get better images and store them in S3, this will also trigger a lambda to retreive that info (with the image in the db being the fallback).
+## How we populate the data in DynamoDB?
+- Hit the `/populate` endpoint
+- Trigger lambda to create SQS messages for each pokemon
+- Each message is picked up by a lambda which reached out to the pokemon api and populates dynamo
 
-Things to consider/look into
-- Do I need all of docker/SAM/Terraform? I want to use and learn them all.
-- I want to be able to test locally - Looks like there is something called localstack - would this work (is this the best solution)
-- Dead letter queue?
-- there is a lambda, SQS queue, SNS topic that all have the same data - change it
-
-
-Hints:
+## Useful tips:
 You can set the concurrency for a lambda to zero (or click Throttle) to ensure the lambda is not invoked - This could allow the message to remain on the queue for inspection.
