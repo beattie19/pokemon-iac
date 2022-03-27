@@ -38,6 +38,8 @@ Once the `terraform apply` is successful there should be some outputs on the cli
 - Should I consider SAM for the lambda/api gateway instead?
 - Can docker fit into this in anyway
 - Add testing
+  - terratest?
+- Consider CI/CD? - could have build steps for testing
 
 ## How we populate the data in DynamoDB?
 - Hit the `/populate` endpoint
