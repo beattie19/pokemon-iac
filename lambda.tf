@@ -8,6 +8,8 @@ resource "aws_lambda_function" "create_pokemon_populate_messages" {
   role             = aws_iam_role.lambda_exec.arn
 }
 
+
+// need to remove lambda.zip in favour of a configurable
 data "archive_file" "zip_lambdas" {
   type        = "zip"
   source_dir  = "${path.module}/main/lambda"
