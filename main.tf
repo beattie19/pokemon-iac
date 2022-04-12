@@ -23,6 +23,7 @@ module "sqs" {
 }
 
 module "domain" {
+  count           = var.isProd ? 1 : 0
   source          = "./modules/domain"
   api_domain_name = var.api_domain_name
   domain_name     = var.domain_name

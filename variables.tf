@@ -14,6 +14,11 @@ variable "environment" {
   default = "dev"
 }
 
+variable "isProd" {
+  type    = bool
+  default = false
+}
+
 variable "lambda_bucket_name" {
   type = string
 }

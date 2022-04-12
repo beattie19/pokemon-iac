@@ -121,24 +121,27 @@ resource "aws_api_gateway_integration_response" "options_integration_response" {
 }
 
 resource "aws_api_gateway_base_path_mapping" "domain_mapping" {
+  count       = var.isProd ? 1 : 0
   api_id      = aws_api_gateway_rest_api.populate-pokemon.id
   stage_name  = aws_api_gateway_stage.pokemon_stage.stage_name
-  domain_name = module.domain.api_gateway_domain_name
+  domain_name = module.domain[0].api_gateway_domain_name
 }
 
 data "aws_route53_zone" "primary" {
-  name = var.domain_name
+  count = var.isProd ? 1 : 0
+  name  = var.domain_name
 }
 
 resource "aws_route53_record" "api_record" {
-  zone_id = data.aws_route53_zone.primary.zone_id
+  count   = var.isProd ? 1 : 0
+  zone_id = data.aws_route53_zone.primary[0].zone_id
   name    = var.api_domain_name
   type    = "A"
 
   alias {
     evaluate_target_health = true
-    name                   = module.domain.api_gateway_regional_domain_name
-    zone_id                = module.domain.api_gateway_zone_id
+    name                   = module.domain[0].api_gateway_regional_domain_name
+    zone_id                = module.domain[0].api_gateway_zone_id
   }
 }
 
