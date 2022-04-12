@@ -7,5 +7,5 @@ lambda_zip_filename = "lambda.zip"
 pokemon_queue       = "pokemon_queue"
 domain_name         = "NOT_NEEDED_IN_DEV"
 api_domain_name     = "NOT_NEEDED_IN_DEV"
-dynamo_table_name   = "pokemon"
+dynamo_table_name   = "pokemon-data"
 isProd              = false
