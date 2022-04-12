@@ -27,7 +27,6 @@ Once the `terraform apply` is successful there should be some outputs on the cli
 ### Code
 - Come up with a new solution that won't take down the database on destroy
 - Pass SQS queue into the lambda event so it's not hard coded
-- Allow the custom domain to code to be optional - don't want to require certificates etc when testing (or if someone else wants to use this)
 - Improve lambda for creating messages (may currently timeout) - may want a lambda that triggers a lambda.
 - Some duplication in API Gateway, consider creating a module.
 
