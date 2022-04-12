@@ -8,11 +8,11 @@ The initial idea was to:
 ## Usage
 ### Terraform
 I am using [aws-vault](https://github.com/99designs/aws-vault) as a way interact with AWS
-- create tfvars file and supply all values
+- create tfvars (see dev.ftvars.example) file and supply all values
 - first run will require `terraform init` to download dependancies
 - (optional) `aws-vault exec {profile name} -- terraform plan -var-file="{choose name}.tfvars"` to create execution plan and review expected changes
 - `aws-vault exec {profile name} -- terraform apply -var-file="{choose name}.tfvars"` to execute the plan and create resources in AWS
-- `aws-vault exec beattie19 -- terraform destroy -var-file="dev.tfvars"` when finished to remove resources from AWS
+- `aws-vault exec beattie19 -- terraform destroy -var-file="{choose name}.tfvars"` when finished to remove resources from AWS
 
 ### Application
 Once the `terraform apply` is successful there should be some outputs on the cli
@@ -25,7 +25,6 @@ Once the `terraform apply` is successful there should be some outputs on the cli
 - Add screenshots from Miro
 
 ### Code
-- Create tfvars template so we know what needs to be set for this to work
 - Come up with a new solution that won't take down the database on destroy
 - Pass SQS queue into the lambda event so it's not hard coded
 - Allow the custom domain to code to be optional - don't want to require certificates etc when testing (or if someone else wants to use this)

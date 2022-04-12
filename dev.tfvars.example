@@ -1,0 +1,11 @@
+service_prefix      = "PREFIX"
+account_id          = "AWS_ACCOUNT_ID"
+my_region           = "ap_southeast_2"
+environment         = "dev"
+lambda_bucket_name  = "LAMBDA_BUCKET_NAME"
+lambda_zip_filename = "lambda.zip"
+pokemon_queue       = "pokemon_queue"
+domain_name         = "NOT_NEEDED_IN_DEV"
+api_domain_name     = "NOT_NEEDED_IN_DEV"
+dynamo_table_name   = "pokemon"
+isProd              = false
