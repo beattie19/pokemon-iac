@@ -8,4 +8,5 @@ pokemon_queue       = "pokemon_queue"
 domain_name         = "NOT_NEEDED_IN_DEV"
 api_domain_name     = "NOT_NEEDED_IN_DEV"
 dynamo_table_name   = "pokemon-data"
+pokemon_count       = 898
 isProd              = false

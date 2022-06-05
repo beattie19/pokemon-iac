@@ -6,6 +6,16 @@ resource "aws_lambda_function" "create_pokemon_populate_messages" {
   source_code_hash = data.archive_file.zip_lambdas.output_base64sha256
   filename         = var.lambda_zip_filename
   role             = aws_iam_role.lambda_exec.arn
+  depends_on = [
+    module.sqs
+  ]
+
+  environment {
+    variables = {
+      SQS_QUEUE_URL = "${module.sqs.queue_url}"
+      POKEMON_COUNT = var.pokemon_count,
+    }
+  }
 }
 
 
